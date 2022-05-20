@@ -4,19 +4,7 @@ import { processColor } from "react-native";
 import { mix } from "./Animations";
 import { clamp, fract } from "./Math";
 
-const {
-  add,
-  multiply,
-  abs,
-  round,
-  interpolate,
-  sub,
-  proc,
-  color,
-  Extrapolate,
-  greaterThan,
-  cond,
-} = Animated;
+const { add, multiply, abs, round, interpolateNode, sub, proc, color, Extrapolate, greaterThan, cond } = Animated;
 
 type Color = Animated.Adaptable<string> | Animated.Adaptable<number>;
 
@@ -57,22 +45,14 @@ export const hsv2rgb = (
 };
 
 export const hsv2color = proc(
-  (
-    h: Animated.Adaptable<number>,
-    s: Animated.Adaptable<number>,
-    v: Animated.Adaptable<number>
-  ) => {
+  (h: Animated.Adaptable<number>, s: Animated.Adaptable<number>, v: Animated.Adaptable<number>) => {
     const { r, g, b } = hsv2rgb(h, s, v);
     return color(r, g, b);
   }
 );
 
 export const colorForBackground = proc(
-  (
-    r: Animated.Adaptable<number>,
-    g: Animated.Adaptable<number>,
-    b: Animated.Adaptable<number>
-  ) => {
+  (r: Animated.Adaptable<number>, g: Animated.Adaptable<number>, b: Animated.Adaptable<number>) => {
     const L = add(multiply(0.299, r), multiply(0.587, g), multiply(0.114, b));
     return cond(greaterThan(L, 186), color(0, 0, 0), color(255, 255, 255));
   }
@@ -180,9 +160,7 @@ export const interpolateColor = (
   colorSpace: "hsv" | "rgb" = "rgb"
 ): Animated.Node<number> => {
   const { inputRange } = config;
-  const outputRange = config.outputRange.map((c) =>
-    typeof c === "number" ? c : processColor(c)
-  );
+  const outputRange = config.outputRange.map((c) => (typeof c === "number" ? c : processColor(c)));
   if (colorSpace === "hsv") {
     return interpolateColorsHSV(value, inputRange, outputRange);
   }
